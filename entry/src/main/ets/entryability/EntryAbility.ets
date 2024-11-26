@@ -2,7 +2,7 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { display, window } from '@kit.ArkUI';
 import { BusinessError } from '@ohos.base';
-import { CLIENT_NAME_KEY, PASSWORD_KEY, PUSH_TOKEN, TOKEN_KEY, URL_KEY, USERNAME_KEY } from '../util/model';
+import { CLIENT_NAME_KEY, PASSWORD_KEY, TOKEN_KEY, URL_KEY, USERNAME_KEY } from '../util/model';
 import { AppUtil } from '@pura/harmony-utils';
 import { HttpUtil } from '../util/http';
 import { pushService } from '@kit.PushKit';
@@ -78,16 +78,6 @@ export default class EntryAbility extends UIAbility {
       AppStorage.setOrCreate('avoidHeight', total);
       AppStorage.setOrCreate('stateHeight', px2vp(avoidAreaSys.topRect.height));
     })
-
-    // 获取Push Token
-    try {
-      const pushToken: string = await pushService.getToken();
-      PersistentStorage.persistProp(PUSH_TOKEN, pushToken);
-      hilog.info(0x0000, 'testTag', 'Succeeded in getting push token');
-    } catch (err) {
-      let e: BusinessError = err as BusinessError;
-      hilog.error(0x0000, 'testTag', 'Failed to get push token: %{public}d %{public}s', e.code, e.message);
-    }
   }
 
   onWindowStageDestroy(): void {

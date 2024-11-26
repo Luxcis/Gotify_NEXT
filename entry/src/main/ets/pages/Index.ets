@@ -12,20 +12,32 @@ struct Index {
   @StorageLink('topRectHeight') topRectHeight: number = 0
   @StorageLink(URL_KEY) url: string = ''
   @StorageLink(TOKEN_KEY) token: string = ''
+  @StorageProp('WindowWidth') windowWidth: number = 0
   @State showSettings: boolean = false
   @State showSideBar: boolean = false
   @State nickname: string = ''
   @State version: string = ''
   @State currentAppTitle: string = 'Gotify'
   @State currentAppId: number = 0
+  private scroller: Scroller = new Scroller()
 
   onPageShow() {
-    this.showSideBar = false
     this.checkServer()
   }
 
+  onBackPress() {
+    console.info('IndexComponent onBackPress');
+    if (this.showSideBar) {
+      animateTo({ duration: 400 }, () => {
+        this.showSideBar = false
+      })
+      return true
+    }
+    return false
+  }
+
   build() {
-    SideBarContainer(SideBarContainerType.Overlay) {
+    SideBarContainer(SideBarContainerType.Embed) {
       Column() {
         SideNavBar({
           nickname: this.nickname,
@@ -37,17 +49,24 @@ struct Index {
       }
       .width('70%')
       .height('100%')
-      .borderRadius({ topRight: 30, bottomRight: 30 })
 
       Column() {
-        TopBar({
-          showSideBar: this.showSideBar,
-          title: this.currentAppTitle
-        }).height('12%')
+        Scroll(this.scroller) {
+          Column() {
+            TopBar({
+              showSideBar: this.showSideBar,
+              title: this.currentAppTitle
+            }).height('12%')
 
-        MessageView({
-          currentAppId: this.currentAppId,
-        }).height('88%')
+            MessageView({
+              currentAppId: this.currentAppId,
+            }).height('88%')
+          }
+        }
+        .enabled(!this.showSideBar)
+        .width(this.windowWidth ? this.windowWidth : '100%')
+        .scrollable(ScrollDirection.Horizontal)
+        .scrollBar(BarState.Off)
 
         Flex() {
           // 设置界面
@@ -66,10 +85,8 @@ struct Index {
           },
         })
       }
-      .width('100%')
+      .width('170%')
       .height('100%')
-      .enabled(!this.showSideBar)
-      .overlay(this.OverlayNode())
     }
     .width('100%')
     .height('100%')
@@ -89,16 +106,6 @@ struct Index {
         switching: $r('app.media.ic_public_drawer_filled')        // 设置侧边栏显示和隐藏状态切换时控制按钮的图标。
       }
     })
-  }
-
-  @Builder
-  OverlayNode() {
-    Column() {
-    }
-    .width('100%')
-    .height('100%')
-    .visibility(this.showSideBar ? Visibility.Visible : Visibility.None)
-    .backgroundColor('rgba(0, 0, 0, 0.6)')
   }
 
   @Builder

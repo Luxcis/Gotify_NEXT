@@ -4,7 +4,6 @@ const CLIENT_NAME_KEY = 'CLIENT_NAME'
 const USERNAME_KEY = 'USERNAME'
 const PASSWORD_KEY = 'PASSWORD'
 const APP_ICON = 'APP_ICON'
-const PUSH_TOKEN = 'PUSH_TOKEN'
 const NEED_LOGIN = 'NEED_LOGIN'
 type RequestMethods = 'get' | 'post' | 'put' | 'delete' | 'patch' | 'option' | 'head'
 const Ok = 200
@@ -27,7 +26,6 @@ export {
   USERNAME_KEY,
   PASSWORD_KEY,
   APP_ICON,
-  PUSH_TOKEN,
   NEED_LOGIN,
   RequestMethods,
   Ok,

@@ -1,5 +1,5 @@
 import { Application, applications } from '../../api/app'
-import { APP_ICON, PUSH_TOKEN, TOKEN_KEY, URL_KEY } from '../../util/model'
+import { APP_ICON, TOKEN_KEY, URL_KEY } from '../../util/model'
 import SideNavBarItem from './SideNavBarItem'
 import { HashMap, url } from '@kit.ArkTS'
 import { DialogUtil } from '@pura/harmony-utils'
@@ -13,7 +13,6 @@ export default struct SideNavBar {
   @StorageProp('topRectHeight') topRectHeight: number = 0
   @StorageProp(URL_KEY) url: string = ''
   @StorageProp(TOKEN_KEY) @Watch('onTokenChange') token: string = ''
-  @StorageProp(PUSH_TOKEN) pushToken: string = ''
   @StorageLink(APP_ICON) appIcon: HashMap<number, string> | undefined = undefined
   @Prop nickname: string
   @Prop version: string
@@ -69,7 +68,6 @@ export default struct SideNavBar {
       .height('30%')
       .width('100%')
       .padding({ top: 55 + this.topRectHeight, left: 20 })
-      .borderRadius({ topRight: 30 })
       .linearGradient({
         angle: 105,
         colors: [[$r('app.color.side_bar_gradient_start'), 0.0], [$r('app.color.side_bar_gradient_end'), 1.0]]
@@ -86,10 +84,13 @@ export default struct SideNavBar {
                 image: $r('app.media.ic_public_app_filled')
               }
             }).onClick(() => {
-              this.currentAppId = 0
-              this.currentAppTitle = 'Gotify'
+              animateTo({ duration: 500 }, () => {
+                this.currentAppId = 0
+                this.currentAppTitle = 'Gotify'
+              })
             })
           }
+          .backgroundColor('#f6f8fc')
           .selected(this.currentAppId === 0)
           .borderRadius(50)
         }
@@ -112,6 +113,7 @@ export default struct SideNavBar {
                 this.currentAppTitle = app.name
               })
             }
+            .backgroundColor('#f6f8fc')
             .selected(this.currentAppId === app.id)
             .borderRadius(50)
           })
@@ -130,6 +132,7 @@ export default struct SideNavBar {
               this.showSettings = true
             })
           }
+          .backgroundColor('#f6f8fc')
           .borderRadius(50)
 
           ListItem({ style: ListItemStyle.CARD }) {
@@ -142,13 +145,12 @@ export default struct SideNavBar {
               }
             }).onClick(() => {
               pushService.getToken().then(token => {
-                this.pushToken = token
                 DialogUtil.showConfirmDialog({
                   message: '请妥善保存你的token，不要泄漏',
                   confirm: "复制并关闭",
                   onAction: () => {
                     // 创建一条纯文本类型的剪贴板内容对象
-                    let pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, this.pushToken);
+                    let pasteData = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, token);
                     // 将数据写入系统剪贴板
                     let systemPasteboard = pasteboard.getSystemPasteboard();
                     systemPasteboard.setDataSync(pasteData)
@@ -160,6 +162,7 @@ export default struct SideNavBar {
               })
             })
           }
+          .backgroundColor('#f6f8fc')
           .borderRadius(50)
         }
       }
@@ -167,10 +170,9 @@ export default struct SideNavBar {
       .width('100%')
       .scrollBar(BarState.Off)
       .padding(5)
-      .backgroundColor(Color.White)
+      .backgroundColor('#f6f8fc')
     }
     .height('100%')
     .width('100%')
-    .borderRadius(10)
   }
 }
