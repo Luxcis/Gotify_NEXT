@@ -1,0 +1,20 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Gotify Ohos Client"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Gotify Ohos Client"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Gotify"
+    },
+    {
+      "name": "permission_reason_INTERNET",
+      "value": "For web browsing"
+    }
+  ]
+}

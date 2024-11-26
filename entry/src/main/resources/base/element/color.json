@@ -1,0 +1,24 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#00436D"
+    },
+    {
+      "name": "main_bar_color",
+      "value": "#4366cf"
+    },
+    {
+      "name": "side_bar_gradient_start",
+      "value": "#3c52cb"
+    },
+    {
+      "name": "side_bar_gradient_end",
+      "value": "#5160cd"
+    },
+    {
+      "name": "side_bar_app_on_select",
+      "value": "#FFE6E6E6"
+    }
+  ]
+}

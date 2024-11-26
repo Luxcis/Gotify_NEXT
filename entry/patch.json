@@ -1,0 +1,11 @@
+{
+  "app": {
+    "bundleName": "com.github.next.gotify",
+    "patchVersionCode": 2000495,
+    "versionCode": 1000000
+  },
+  "module": {
+    "name": "entry",
+    "type": "hotreload"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "00000030C2BE3525EF8D31279DDA412E914CCA76280B865B860910CD6629B4CAEF3455423E0E13EFCA869EFF44D0E6ACD6D56CCE15A17A76325282353864CD02",
+          "certpath": "/Users/luxcis/data/workspace/HMOS/Gotify/sign/debug/debug.cer",
+          "keyAlias": "debug",
+          "keyPassword": "0000003005010E75E7FB1088FA6CD227A5C5561566E0ED85576AEF1365B2851AD07ACF483BDB02BC0EB8414EE376D933FA21F10A965C026386ABEAD28BE76AB9",
+          "profile": "/Users/luxcis/data/workspace/HMOS/Gotify/sign/debug/debugDebug.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/luxcis/data/workspace/HMOS/Gotify/sign/debug/debug.p12"
+        }
+      },
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/luxcis/data/workspace/HMOS/Gotify/sign/release/manual.cer",
+          "storePassword": "00000030EBA6AD6D25A28B6A3A193487264B51AB2DC5B0E3305F9ACC7F3A2E7DB0B206D3F13EEE1C64455E9EF0D04752D73D5E0D00D0CD1765E27DCA6B7FD1BA",
+          "keyAlias": "manual",
+          "keyPassword": "00000030D3E24B169AD9933F6F58E213417E6E84ACB0571FA7764BA02DA65F59D15D1DEF439DBBB7F573CFB4ED3B30B7E49CE936DC1818683625A4881758C746",
+          "profile": "/Users/luxcis/data/workspace/HMOS/Gotify/sign/release/manualRelease.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/luxcis/data/workspace/HMOS/Gotify/sign/release/manual.p12"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
