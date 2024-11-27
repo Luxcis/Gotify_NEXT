@@ -22,12 +22,20 @@ export interface MessagePaging {
   size: number;
 }
 
-export const getAllMessage = (): Promise<MessageResponse> => {
-  return HttpUtil.get('/message')
+export const getMessages = (since: number, limit: number, appId?: number): Promise<MessageResponse> => {
+  if (appId && appId > 0) {
+    return getAllMessageByAppId(since, limit, appId)
+  } else {
+    return getAllMessage(since, limit)
+  }
 }
 
-export const getAllMessageByAppId = (appId: number): Promise<MessageResponse> => {
-  return HttpUtil.get(`/application/${appId}/message`)
+export const getAllMessage = (since: number, limit: number): Promise<MessageResponse> => {
+  return HttpUtil.get('/message', { since, limit })
+}
+
+export const getAllMessageByAppId = (since: number, limit: number, appId: number): Promise<MessageResponse> => {
+  return HttpUtil.get(`/application/${appId}/message`, { since, limit })
 }
 
 export const deleteMessageById = (id: number): Promise<ESObject> => {

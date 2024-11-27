@@ -1,7 +1,7 @@
 {
   "app": {
     "bundleName": "com.github.next.gotify",
-    "patchVersionCode": 2000523,
+    "patchVersionCode": 2000573,
     "versionCode": 1000000
   },
   "module": {

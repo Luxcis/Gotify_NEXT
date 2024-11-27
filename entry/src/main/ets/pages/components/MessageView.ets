@@ -1,7 +1,7 @@
 import webSocket from '@ohos.net.webSocket';
 import { APP_ICON, TOKEN_KEY, URL_KEY } from '../../util/model';
 import { HashMap, url } from '@kit.ArkTS';
-import { deleteMessageById, getAllMessage, getAllMessageByAppId, Message } from '../../api/message';
+import { deleteMessageById, getMessages, Message } from '../../api/message';
 import { AlertMessage } from '../../util/alert';
 import MessageContent from './MessageContent';
 import { DateUtil } from '@pura/harmony-utils';
@@ -13,8 +13,15 @@ export default struct MessageView {
   @StorageLink(APP_ICON) appIcon: HashMap<number, string> | undefined = undefined
   @Prop @Watch('onCurrentAppChange') currentAppId: number
   @State messages: Message[] = []
+  @State since: number = 0
+  @State limit: number = 10
   @State isRefreshing: boolean = false
+  @State canLoad: boolean = false
+  @State isLoading: boolean = false;
+  @State isEnd: boolean = false;
+  @State isAll: boolean = true;
   private webSocketImpl?: webSocket.WebSocket | null = null;
+  private scroll: Scroller = new Scroller()
 
   onTokenChange() {
     //刷新ws监听
@@ -36,11 +43,11 @@ export default struct MessageView {
     if (this.url) {
       this.close()
       let webSocketImpl = webSocket.createWebSocket(); // 创建WebSocket实例
-      webSocketImpl.on('open', (error, data) => { // 监听连接建立
+      webSocketImpl.on('open', (_, data) => { // 监听连接建立
         this.webSocketImpl = webSocketImpl; // 连接建立成功，可以调用send方法向服务器发送数据
         console.log('连接已建立：' + JSON.stringify(data))
       });
-      webSocketImpl.on('message', (error, data) => { // 监听服务器端发送的数据
+      webSocketImpl.on('message', (_, data) => { // 监听服务器端发送的数据
         console.log('接收到消息：' + data)
         const receivedMessage = JSON.parse(data as string) as Message
         if (receivedMessage.appid === this.currentAppId || this.currentAppId === 0) {
@@ -81,7 +88,7 @@ export default struct MessageView {
   build() {
     Column() {
       Refresh({ refreshing: $$this.isRefreshing }) {
-        List({ space: 10 }) {
+        List({ space: 10, scroller: this.scroll }) {
           ForEach(this.messages, (msg: Message) => {
             ListItem({ style: ListItemStyle.CARD }) {
               MessageContent({
@@ -115,6 +122,16 @@ export default struct MessageView {
           }, (item: Message) => {
             return item.id.toString()
           })
+
+          ListItem() {
+            Row() {
+              LoadingProgress().height(32).width(48)
+            }.width("100%")
+            .height(64)
+            .justifyContent(FlexAlign.Center)
+            // 当不处于加载中状态时隐藏组件
+            .visibility(this.isLoading ? Visibility.Visible : Visibility.Hidden)
+          }
         }
         .width('100%')
         .height('100%')
@@ -125,29 +142,35 @@ export default struct MessageView {
           endMargin: 20
         })
         .scrollBar(BarState.Off)
+        .onScrollStart(() => {
+          if (this.isEnd) {
+            console.log('到底辣！！！')
+            this.canLoad = true
+            animateTo({ duration: 1000 }, () => {
+              this.isLoading = true
+            })
+          } else {
+            this.canLoad = false
+          }
+        })
+        .onReachEnd(() => {
+          if (this.isEnd && this.canLoad && !this.isAll) {
+            console.log('onReachEnd到底辣！！！')
+            animateTo({ duration: 500 }, () => {
+              this.loadMessage(this.since)
+            })
+          }
+        })
+        .onScrollIndex((start: number, end: number) => {
+          console.log(`${start}|${end}`)
+          this.isEnd = end === this.messages.length
+        })
       }
       .onRefreshing(() => {
         console.log('appId: ' + this.currentAppId)
+        this.since = 0
         animateTo({ duration: 500 }, () => {
-          if (this.currentAppId === 0) {
-            getAllMessage().then(res => {
-              this.messages = []
-              this.messages = res.messages
-            }).catch((err: Error) => {
-              AlertMessage('全量消息刷新失败：' + err.message)
-            }).finally(() => {
-              this.isRefreshing = false
-            })
-          } else {
-            getAllMessageByAppId(this.currentAppId).then(res => {
-              this.messages = []
-              this.messages = res.messages
-            }).catch((err: Error) => {
-              AlertMessage('应用消息刷新失败：' + err.message)
-            }).finally(() => {
-              this.isRefreshing = false
-            })
-          }
+          this.loadMessage(this.since)
         })
       })
       .refreshOffset(64)
@@ -172,5 +195,29 @@ export default struct MessageView {
     }
     .padding(4)
     .justifyContent(FlexAlign.SpaceEvenly)
+  }
+
+  loadMessage(since: number) {
+    getMessages(since, this.limit, this.currentAppId).then(res => {
+      if (this.isRefreshing) {
+        this.messages = res.messages
+        this.scroll.scrollToIndex(0, true)
+      } else {
+        this.messages.push(...res.messages)
+      }
+      this.since = res.paging.since
+      this.isAll = res.messages.length === 0
+    }).catch((err: Error) => {
+      if (this.currentAppId === 0) {
+        AlertMessage('全量消息刷新失败：' + err.message)
+      } else {
+        AlertMessage('应用消息刷新失败：' + err.message)
+      }
+    }).finally(() => {
+      this.isRefreshing = false
+      this.isLoading = false
+      this.canLoad = false
+      this.isEnd = false
+    })
   }
 }
